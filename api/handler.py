@@ -1,16 +1,19 @@
 import os
 from flask import Flask, render_template, request, send_file, jsonify
 from dotenv import load_dotenv
-import openai
 from openai import OpenAI
 
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    template_folder=os.path.join(os.path.dirname(__file__), '../templates'),
+    static_folder=os.path.join(os.path.dirname(__file__), '../static')
+)
 
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
-GENERATED_FILE = 'generated_site.html'
+GENERATED_FILE = os.path.join(os.path.dirname(__file__), '../generated_site.html')
 
 PROMPT_TEMPLATE = (
     "Создай адаптивный одностраничный сайт в стиле '{style}' по описанию: {desc}. "
@@ -54,5 +57,5 @@ def download():
         return '', 404
     return send_file(GENERATED_FILE, as_attachment=True)
 
-if __name__ == '__main__':
-    app.run(debug=True) 
+# Vercel запускает функцию как handler: app = ...
+app = app 
